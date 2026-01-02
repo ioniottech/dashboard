@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@layer base {
+  :root {
+    --background: 280 75% 8%;
+    --foreground: 0 0% 98%;
+
+    --card: 280 60% 12%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 280 60% 10%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 10 100% 64%;
+    --primary-foreground: 280 75% 8%;
+
+    --secondary: 280 92% 29%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 280 40% 18%;
+    --muted-foreground: 280 10% 65%;
+
+    --accent: 340 90% 51%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 280 40% 20%;
+    --input: 280 40% 20%;
+    --ring: 10 100% 64%;
+
+    --radius: 0.75rem;
+
+    --gradient-primary: linear-gradient(135deg, hsl(10 100% 64%) 0%, hsl(340 90% 51%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(280 92% 29%) 0%, hsl(280 75% 8%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(280 60% 14%) 0%, hsl(280 60% 10%) 100%);
+    --gradient-glow: radial-gradient(circle, hsl(10 100% 64% / 0.3) 0%, transparent 70%);
+
+    --shadow-glow-primary: 0 0 30px hsl(10 100% 64% / 0.3);
+    --shadow-glow-accent: 0 0 30px hsl(340 90% 51% / 0.3);
+    --shadow-glow-secondary: 0 0 30px hsl(280 92% 29% / 0.3);
+
+    --sidebar-background: 280 65% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 10 100% 64%;
+    --sidebar-primary-foreground: 280 75% 8%;
+    --sidebar-accent: 280 50% 18%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 280 40% 18%;
+    --sidebar-ring: 10 100% 64%;
+  }
+
+  .dark {
+    --background: 280 75% 8%;
+    --foreground: 0 0% 98%;
+    --card: 280 60% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 280 60% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 10 100% 64%;
+    --primary-foreground: 280 75% 8%;
+    --secondary: 280 92% 29%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 280 40% 18%;
+    --muted-foreground: 280 10% 65%;
+    --accent: 340 90% 51%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 280 40% 20%;
+    --input: 280 40% 20%;
+    --ring: 10 100% 64%;
+    --sidebar-background: 280 65% 10%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 10 100% 64%;
+    --sidebar-primary-foreground: 280 75% 8%;
+    --sidebar-accent: 280 50% 18%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 280 40% 18%;
+    --sidebar-ring: 10 100% 64%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-xl border border-border/50;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+  }
+
+  .glow-primary {
+    box-shadow: var(--shadow-glow-primary);
+  }
+
+  .glow-accent {
+    box-shadow: var(--shadow-glow-accent);
+  }
+
+  .glow-secondary {
+    box-shadow: var(--shadow-glow-secondary);
+  }
+
+  .pulse-dot {
+    @apply relative;
+  }
+
+  .pulse-dot::before {
+    content: '';
+    @apply absolute inset-0 rounded-full bg-primary animate-ping;
+    animation-duration: 1.5s;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 2px;
+  }
+}
+
+@layer utilities {
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+}
