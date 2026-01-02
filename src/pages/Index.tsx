@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   Server,
@@ -44,6 +44,7 @@ export default function Index() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeItem, setActiveItem] = useState("dashboard");
   const location = useLocation();
+  const mainRef = useRef<HTMLElement | null>(null);
 
   // Sync active sidebar item with route if visiting /dashboard/chat
   useEffect(() => {
@@ -124,6 +125,29 @@ export default function Index() {
     }
   };
 
+  // When switching sidebar items, reset the dashboard main scroll position
+  useEffect(() => {
+    if (!mainRef.current) return;
+
+    const reset = () => {
+      try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch {}
+      try { if (mainRef.current) (mainRef.current as HTMLElement).scrollTop = 0; } catch {}
+
+      // also reset inner scrollable elements within the main container
+      try {
+        const scrollables = Array.from(mainRef.current!.querySelectorAll<HTMLElement>('*'))
+          .filter((el) => el.scrollHeight > el.clientHeight && /auto|scroll/.test(getComputedStyle(el).overflowY || ''));
+        scrollables.forEach((el) => { try { el.scrollTop = 0; } catch {} });
+      } catch {}
+    };
+
+    reset();
+    const raf = requestAnimationFrame(() => reset());
+    const t = window.setTimeout(() => reset(), 100);
+
+    return () => { try { cancelAnimationFrame(raf); } catch {} ; clearTimeout(t); };
+  }, [activeItem]);
+
   return (
     <div className="min-h-screen bg-background">
       <DashboardSidebar collapsed={sidebarCollapsed} setCollapsed={setSidebarCollapsed} activeItem={activeItem} setActiveItem={setActiveItem} />
@@ -132,6 +156,7 @@ export default function Index() {
         animate={{ marginLeft: sidebarCollapsed ? 80 : 280 }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
         className="min-h-screen p-4 lg:p-8 transition-all duration-300 lg:ml-0"
+        ref={(el) => (mainRef.current = el)}
         style={{ marginLeft: 0 }}
       >
         <div className="lg:hidden h-16" />

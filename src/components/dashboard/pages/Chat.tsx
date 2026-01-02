@@ -58,7 +58,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-primary">IonIoTtech Chat</h1>
         <p className="text-sm text-muted-foreground mt-1"></p>
@@ -66,7 +66,7 @@ export default function Chat() {
 
       <div className="space-y-4">
         {/* Chat window with responsive height */}
-        <div className="bg-white rounded-xl shadow-sm border p-4 h-[60vh] md:h-[65vh] overflow-y-auto scrollbar-thin">
+        <div className="bg-white rounded-xl shadow-sm border p-3 h-[25vh] md:h-[40vh] overflow-y-auto scrollbar-thin">
           {messages.length === 0 && (
             <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
               Start a conversation...

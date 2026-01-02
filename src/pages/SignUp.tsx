@@ -10,6 +10,7 @@ import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } f
 import { auth } from "@/lib/firebase";
 
 export default function SignUp() {
+  const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? '';
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -43,7 +44,66 @@ export default function SignUp() {
       return;
     }
 
+    // Run reCAPTCHA v3 (if site key provided) to get a token before attempting signup
+    const loadReCaptcha = (siteKey: string) =>
+      new Promise<any>((resolve, reject) => {
+        try {
+          if ((window as any).grecaptcha && (window as any).grecaptcha.execute) return resolve((window as any).grecaptcha);
+          const id = 'recaptcha-v3-script';
+          if (document.getElementById(id)) {
+            const waitForG = () => {
+              if ((window as any).grecaptcha && (window as any).grecaptcha.ready) resolve((window as any).grecaptcha);
+              else setTimeout(waitForG, 50);
+            };
+            waitForG();
+            return;
+          }
+          const script = document.createElement('script');
+          script.id = id;
+          script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
+          script.async = true;
+          script.defer = true;
+          script.onload = () => {
+            if ((window as any).grecaptcha) resolve((window as any).grecaptcha);
+            else reject(new Error('grecaptcha not available after script load'));
+          };
+          script.onerror = () => reject(new Error('Failed to load reCAPTCHA script'));
+          document.head.appendChild(script);
+        } catch (err) {
+          reject(err);
+        }
+      });
+
+    const getReCaptchaToken = async (siteKey: string) => {
+      const grecaptcha = await loadReCaptcha(siteKey);
+      return new Promise<string>((resolve, reject) => {
+        try {
+          grecaptcha.ready(() => {
+            grecaptcha.execute(siteKey, { action: 'signup' }).then((token: string) => resolve(token)).catch(reject);
+          });
+        } catch (err) {
+          reject(err);
+        }
+      });
+    };
+
     setIsLoading(true);
+
+    // If a site key is configured, require a valid token. If not configured, warn and proceed.
+    if (RECAPTCHA_SITE_KEY) {
+      try {
+        const token = await getReCaptchaToken(RECAPTCHA_SITE_KEY);
+        // You should verify this token on your server. For now we log it so developers can confirm it loads.
+        console.debug('reCAPTCHA token:', token?.slice(0, 10) + '...');
+      } catch (err) {
+        console.error('reCAPTCHA failed to load or execute', err);
+        setIsLoading(false);
+        alert('reCAPTCHA failed to load — check console and domain restrictions.');
+        return;
+      }
+    } else {
+      console.warn('VITE_RECAPTCHA_SITE_KEY not set — skipping reCAPTCHA. Configure site key to enable protection.');
+    }
     try {
       await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       setIsLoading(false);
@@ -270,13 +330,13 @@ export default function SignUp() {
               />
               <label htmlFor="terms" className="text-sm text-muted-foreground cursor-pointer">
                 I agree to the{" "}
-                <a href="#" className="text-primary hover:text-accent font-medium transition-colors">
+                {/* <a href="#" className="text-primary hover:text-accent font-medium transition-colors"> */}
                   Terms of Service
-                </a>{" "}
+                {/* </a>{" "} */}
                 and{" "}
-                <a href="#" className="text-primary hover:text-accent font-medium transition-colors">
+                {/* <a href="#" className="text-primary hover:text-accent font-medium transition-colors"> */}
                   Privacy Policy
-                </a>
+                {/* </a> */}
               </label>
             </div>
 
